@@ -13,7 +13,7 @@ Simply run the following command using [Maven].
 mvn exec:java -Dexec.mainClass=com.hascode.tutorial.App
 ```
 
-Afterwards the REST service is accessible at _localhost_, port 9000_.
+Afterwards the REST service is accessible at _localhost_, _port 9000_.
 
 
 ## Supported Operations
