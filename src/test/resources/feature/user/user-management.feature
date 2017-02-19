@@ -1,20 +1,45 @@
 Feature: User management
+
+Background:
+* url 'http://localhost:9000'
+
 Scenario: List existing users
 
-Given url 'http://localhost:9000/user'
+Given path '/user'
 When method GET
 Then status 200
-And match response == []
+And match $ == []
 
-Scenario: Create and retreive new user
+Scenario: Create and receive new user
 
-Given url 'http://localhost:9000/user'
-And request {id:'', name:'Fred'}
+Given path '/user'
+And request {id:'', name:'Fred', age:22}
 When method POST
 Then status 200
-And match response == {id:'#ignore', name:'Fred'}
+And match response == {id:'#uuid', name:'Fred', age:22}
 
-Given path response.id
+Scenario Outline: Create multiple users and verify their id, name and age
+
+Given path '/user'
+And request {id:'', name:'<name>', age: <age>}
+When method POST
+Then status 200
+And match $ == {id:'#uuid', name: '<name>', age: <age>}
+
+Examples:
+| name  | age |
+| Tim   | 42  |
+| Liz   | 16  |
+| Selma | 65  |
+| Ted   | 12  |
+| Luise | 19  |
+
+Scenario: Remove all users
+Given path '/user'
+When method DELETE
+Then status 200
+
+Given path '/user'
 When method GET
 Then status 200
-And match response = {id:response.id, name:'Fred'}
+And match $ == []
