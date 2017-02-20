@@ -29,6 +29,8 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
         Collection<User> users = fakeStore.values();
+        LOG.info("{} users found", users.size());
+
         return Response.ok(new GenericEntity<Collection<User>>(users) {
         }).build();
     }
@@ -36,7 +38,8 @@ public class UserResource {
     @Path("/{userId}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAll(@PathParam("userId") String userId) {
+    public Response getUserById(@PathParam("userId") String userId) {
+        LOG.info("fetching user by user-id: {}", userId);
         return Response.ok(fakeStore.get(userId)).build();
     }
 
@@ -53,6 +56,7 @@ public class UserResource {
 
     @DELETE
     public Response purgeUsers() {
+        LOG.info("removing all {} users", fakeStore.size());
         fakeStore.clear();
         return Response.ok().build();
     }
