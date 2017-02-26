@@ -1,5 +1,6 @@
 package com.hascode.tutorial;
 
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class UserResource {
     private static final Logger LOG = LoggerFactory.getLogger(UserResource.class);
 
     private static final Map<String, User> fakeStore = new ConcurrentHashMap<>();
+    private static final Map<String, User> tokenToUser = new ConcurrentHashMap<>();
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -48,6 +50,7 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response save(User user) {
         user.setId(UUID.randomUUID().toString().toUpperCase());
+        user.setPassword(Base64.getEncoder().encodeToString(user.getId().getBytes())); // never-irl..;)
         fakeStore.put(user.getId(), user);
 
         LOG.info("new user {} saved", user);
@@ -59,5 +62,10 @@ public class UserResource {
         LOG.info("removing all {} users", fakeStore.size());
         fakeStore.clear();
         return Response.ok().build();
+    }
+
+    @Path("/secured")
+    public SecuredResource getSecuredResource() {
+        return new SecuredResource();
     }
 }
