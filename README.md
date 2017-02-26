@@ -2,7 +2,7 @@
 
 Examples for writing test scenarios the behavior-driven-development way using Java and [Karate].
 
-[Karate] is a new testing frameworks that eases the task of testing web-services.
+[Karate] is a new testing frameworks that eases the task of testing web-services and integrates with well-known tools like JUnit or TestNG.
 
 
 ## Starting the RESTful Webservice for Test
