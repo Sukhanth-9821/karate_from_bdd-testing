@@ -9,5 +9,5 @@ function(credential) {
         throw ('login failed: ' + response);
     }
     
-    return response.authToken
+    return response.body.authToken;
 }

@@ -1,5 +1,7 @@
 package com.hascode.tutorial;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -24,8 +26,8 @@ import org.slf4j.LoggerFactory;
 public class UserResource {
     private static final Logger LOG = LoggerFactory.getLogger(UserResource.class);
 
-    private static final Map<String, User> fakeStore = new ConcurrentHashMap<>();
-    private static final Map<String, User> tokenToUser = new ConcurrentHashMap<>();
+    private static final Map<String, User> USER_STORE = new ConcurrentHashMap<>();
+    private static final Map<String, String> TOKEN_TO_USERID = new ConcurrentHashMap<>();
 
     @XmlRootElement
     static class Credential {
@@ -52,7 +54,7 @@ public class UserResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAll() {
-        Collection<User> users = fakeStore.values();
+        Collection<User> users = USER_STORE.values();
         LOG.info("{} users found", users.size());
 
         return Response.ok(new GenericEntity<Collection<User>>(users) {
@@ -64,7 +66,7 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserById(@PathParam("userId") String userId) {
         LOG.info("fetching user by user-id: {}", userId);
-        return Response.ok(fakeStore.get(userId)).build();
+        return Response.ok(USER_STORE.get(userId)).build();
     }
 
     @POST
@@ -72,7 +74,7 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response save(User user) {
         user.setId(UUID.randomUUID().toString().toUpperCase());
-        fakeStore.put(user.getId(), user);
+        USER_STORE.put(user.getId(), user);
 
         LOG.info("new user {} saved", user);
         return Response.ok(user).build();
@@ -80,20 +82,45 @@ public class UserResource {
 
     @DELETE
     public Response purgeUsers() {
-        LOG.info("removing all {} users", fakeStore.size());
-        fakeStore.clear();
+        LOG.info("removing all {} users", USER_STORE.size());
+        USER_STORE.clear();
         return Response.ok().build();
     }
 
     @POST
     @Path("/login")
     public Response login(Credential credential) {
-        LOG.info("login user with id: '{}' and password '{}'", credential.id, credential.password);
-        return Response.ok("{\"authToken\":\"xxxx\"}").build();
+        LOG.info("login user with id: '{}' and password '{}'", credential.getId(), credential.getPassword());
+        if (validCredential(credential)) {
+            LOG.info("login for user-id '{}' successful", credential.id);
+            String authToken = authorize(credential);
+            return Response.ok("{\"authToken\":\"" + authToken + "\"}").build();
+        }
+        return Response.status(401).build();
+    }
+
+    private String authorize(Credential credential) {
+        String code = new BigInteger(130, new SecureRandom()).toString(20);
+        TOKEN_TO_USERID.put(code, credential.getId());
+        return code;
+    }
+
+    private boolean validCredential(Credential credential) {
+        if (!USER_STORE.containsKey(credential.getId())) {
+            LOG.warn("no user with id {} known", credential.getId());
+            return false;
+        }
+        if (!USER_STORE.get(credential.id).getPassword().equals(credential.getPassword())) {
+            LOG.warn("credentials are invalid");
+            return false;
+        }
+
+        LOG.info("credentials are valid");
+        return true;
     }
 
     @Path("/secured")
     public SecuredResource getSecuredResource() {
-        return new SecuredResource();
+        return new SecuredResource(TOKEN_TO_USERID);
     }
 }
