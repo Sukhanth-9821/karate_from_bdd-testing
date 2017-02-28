@@ -59,10 +59,14 @@ And request {id:'', name:'Eleonore', age:31, password:'foobar'}
 When method POST
 Then status 200
 And def user = response
-And def authToken = call userLogin {id:'#(user.id)', password:'#(user.password)'}
 
 Given path '/user/secured/date'
-And header Auth-Token = authToken
+When method GET
+Then status 403
+
+
+Given path '/user/secured/date'
+And header Auth-Token = call userLogin {id:'#(user.id)', password:'#(user.password)'}
 When method GET
 Then status 200
 And match $ == {date:'#notnull'}
