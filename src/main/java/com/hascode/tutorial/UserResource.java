@@ -1,6 +1,5 @@
 package com.hascode.tutorial;
 
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -16,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +26,28 @@ public class UserResource {
 
     private static final Map<String, User> fakeStore = new ConcurrentHashMap<>();
     private static final Map<String, User> tokenToUser = new ConcurrentHashMap<>();
+
+    @XmlRootElement
+    static class Credential {
+        private String id;
+        private String password;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+    }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -50,7 +72,6 @@ public class UserResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response save(User user) {
         user.setId(UUID.randomUUID().toString().toUpperCase());
-        user.setPassword(Base64.getEncoder().encodeToString(user.getId().getBytes())); // never-irl..;)
         fakeStore.put(user.getId(), user);
 
         LOG.info("new user {} saved", user);
@@ -62,6 +83,13 @@ public class UserResource {
         LOG.info("removing all {} users", fakeStore.size());
         fakeStore.clear();
         return Response.ok().build();
+    }
+
+    @POST
+    @Path("/login")
+    public Response login(Credential credential) {
+        LOG.info("login user with id: '{}' and password '{}'", credential.id, credential.password);
+        return Response.ok("{\"authToken\":\"xxxx\"}").build();
     }
 
     @Path("/secured")

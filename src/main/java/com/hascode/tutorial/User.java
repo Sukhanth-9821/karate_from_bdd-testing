@@ -1,7 +1,6 @@
 package com.hascode.tutorial;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
 public class User {
@@ -46,10 +45,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [name=" + name + ", id=" + id + ", age=" + age + "]";
+        // print password for demonstration-purpose
+        return "User [name=" + name + ", id=" + id + ", age=" + age + ", password=" + password + "]";
     }
 
-    @XmlTransient
     public String getPassword() {
         return password;
     }

@@ -1,7 +1,8 @@
 Feature: User management
 
 Background:
-* url 'http://localhost:9000'
+* url baseUrl
+* def userLogin = read('classpath:user-login.js')
 
 Scenario: List existing users
 
@@ -14,17 +15,17 @@ And assert responseTime < 1000
 Scenario: Create and receive new user
 
 Given path '/user'
-And request {id:'', name:'Fred', age:22}
+And request {id:'', name:'Fred', age:22, password:'abc123'}
 When method POST
 Then status 200
-And match response == {id:'#uuid', name:'Fred', age:22}
+And match response == {id:'#uuid', name:'Fred', age:22, password:'abc123'}
 And assert responseTime < 1000
 And def user = response
 
 Given path '/user/'+user.id
 When method GET
 Then status 200
-And match $ == {id:'#(user.id)', name:'#(user.name)', age:#(user.age)}
+And match $ == {id:'#(user.id)', name:'#(user.name)', age:#(user.age), password:'#(user.password)'}
 And assert responseTime < 1000
 
 Scenario Outline: Create multiple users and verify their id, name and age
@@ -50,6 +51,24 @@ Examples:
 | Selma | 65  |
 | Ted   | 12  |
 | Luise | 19  |
+
+Scenario: Access secured resources
+
+
+Given path '/user'
+And request {id:'', name:'Eleonore', age:31, password:'foobar'}
+When method POST
+Then status 200
+And def user = response
+And def authToken = call userLogin {id:user.id, password:user.password}
+And print 'XXXXXXXXXXXXXXXXX '+authToken
+
+#Given path '/user/'+user.id+'/login'
+#And request user.password
+#When method POST
+#Then status 200
+#And match responseHeaders['Auth-Token'][0] == '#notnull'
+#And def authToken = responseHeaders['Auth-Token'][0]
 
 Scenario: Remove all users
 Given path '/user'

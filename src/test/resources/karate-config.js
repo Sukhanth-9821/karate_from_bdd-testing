@@ -1,3 +1,5 @@
 function() {   
-	return {}
+	return {
+		baseUrl: 'http://localhost:9000'
+	}
 }
