@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>com.intuit.karate</groupId>
 			<artifactId>karate-junit4</artifactId>
-			<version>0.2.0</version>
+			<version>0.2.4</version>
 		</dependency>
 
 		<!-- dependencies for jetty and jax-rs, jersey -->
