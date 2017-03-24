@@ -2,7 +2,6 @@ Feature: User management
 
 Background:
 * url baseUrl
-* def userLogin = read('classpath:user-login.js')
 
 Scenario: List existing users
 
@@ -66,7 +65,8 @@ Then status 403
 
 
 Given path '/user/secured/date'
-And header Auth-Token = call userLogin {id:'#(user.id)', password:'#(user.password)'}
+And def userLogin = call read('classpath:feature/security/user-login.feature') {id:'#(user.id)', password:'#(user.password)'}
+And header Auth-Token = userLogin.authToken
 When method GET
 Then status 200
 And match $ == {date:'#notnull'}
