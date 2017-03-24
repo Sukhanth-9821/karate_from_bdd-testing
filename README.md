@@ -5,7 +5,16 @@ Examples for writing test scenarios the behavior-driven-development way using Ja
 [Karate] is a new testing frameworks that eases the task of testing web-services and integrates with well-known tools like JUnit or TestNG.
 
 
-## Starting the RESTful Webservice for Test
+## Running the Karate Tests
+
+Simply run it using [Maven]:
+
+```
+mvn test
+```
+
+
+## Starting the RESTful Webservice
 
 Simply run the following command using [Maven].
 
@@ -18,30 +27,86 @@ Afterwards the REST service is accessible at _localhost_, _port 9000_.
 
 ## Supported Operations
 
-### Listing all users
+REST resources of karate-bdd-testing:
+1.0.0
 
-```
-curl -XGET http://localhost:9000/user
-```
+### Return all users
 
-### Creating new user
+GET user:
+ Request:
+  No body
 
-```
-curl -XPOST -H"Content-type: application/json" -d'{"id":"","name":"Fred"}' http://localhost:9000/user
-```
+ Response:
+  Content-Type: application/json
+  Status Codes: 200
+   Response Body: com.hascode.tutorial.UserResource$1
+    {}
 
-### Fetching user by id
+### Create new user
 
-```
-curl -XGET http://localhost:9000/user/BC1572C2-E281-44CE-9CC0-AEA175D1CDFE
-```
+POST user:
+ Request:
+  Content-Type: application/json
+  Request Body: com.hascode.tutorial.User
+   {"age":0,"id":"string","name":"string","password":"string"}
 
-## Running Karate BDD Tests
+ Response:
+  Content-Type: application/json
+  Status Codes: 200
+   Response Body: com.hascode.tutorial.User
+    {"age":0,"id":"string","name":"string","password":"string"}
 
 
-```
-mvn test
-```
+### Remove user
+
+DELETE user:
+ Request:
+  No body
+
+ Response:
+  Content-Type: */*
+  Status Codes: 200
+
+### Login user
+
+POST user/login:
+ Request:
+  Content-Type: */*
+  Request Body: com.hascode.tutorial.UserResource$Credential
+   {"id":"string","password":"string"}
+
+ Response:
+  Content-Type: */*
+  Status Codes: 200
+   Response Body: java.lang.String
+
+  Status Codes: 401
+
+### Secured API: Fetch a date
+
+GET user/secured/date:
+ Request:
+  No body
+  Header Param: Auth-Token, java.lang.String
+
+ Response:
+  Content-Type: application/json
+  Status Codes: 200
+   Response Body: java.lang.String
+
+  Status Codes: 403
+
+### Get user by id
+
+GET user/{userId}:
+ Request:
+  No body
+  Path Param: userId, java.lang.String
+
+ Response:
+  Content-Type: application/json
+  Status Codes: 200
+   Response Body: 
 
 
 ## More
