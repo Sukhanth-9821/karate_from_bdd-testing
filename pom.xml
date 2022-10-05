@@ -79,7 +79,7 @@
 							<goal>analyze-jaxrs</goal>
 						</goals>
 						<configuration>
-							<backend>plaintext</backend>
+							<backend>swagger</backend>
 							<deployedDomain>localhost</deployedDomain>
 						</configuration>
 					</execution>
