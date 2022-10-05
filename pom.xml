@@ -22,6 +22,11 @@
 			<artifactId>karate-junit4</artifactId>
 			<version>0.2.9</version>
 		</dependency>
+		<dependency>
+		<groupId>javax.xml.bind</groupId>
+		<artifactId>jaxb-api</artifactId>
+		<version>2.3.0</version>
+		</dependency>
 
 		<!-- dependencies for jetty and jax-rs, jersey -->
 		<dependency>
